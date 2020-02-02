@@ -1,0 +1,15 @@
+#ignore all files
+*
+
+#except the following files
+!*.cpp
+!*.hpp
+!*.c
+!*.h
+!*.inl
+
+!*.go
+!*.json
+
+!*.md
+
