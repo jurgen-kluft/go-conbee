@@ -2,6 +2,8 @@
 go-conbee
 ======
 
+STATUS: BETA, currently testing!
+
 Wrapper API and cli examples in golang for interacting with lights via Deconz Conbee HTTP API.
 
 Supported API:
