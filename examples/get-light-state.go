@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	conbeeHost = "http://10.0.0.18"
+	conbeeHost = "10.0.0.18"
 	conbeeKey  = "0A498B9909"
 	blinkState groups.State
 )

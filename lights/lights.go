@@ -30,7 +30,7 @@ type Lights struct {
 type Light struct {
 	Name         string `json:"name"`
 	ID           int    `json:"id,omitempty"`
-	ETag         int    `json:"etag,omitempty"`
+	ETag         string `json:"etag,omitempty"`
 	State        State  `json:"state,omitempty"`
 	HasColor     bool   `json:"hascolor,omitempty"`
 	Type         string `json:"type,omitempty"`

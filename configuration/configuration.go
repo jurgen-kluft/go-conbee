@@ -143,23 +143,28 @@ func (c *Configuration) DeleteAPIKey(apikey string, apikeyToBeDeleted string) ([
 	return apiResponse, err
 }
 
-func (c *Configuration) GetFullState(username string) (string, error) {
+func (c *Configuration) GetFullState(username string) (FullState, error) {
+	var fullstate FullState
 	url := fmt.Sprintf(fullStateURL, c.Hostname, username)
 	request, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return "", err
+		return fullstate, err
 	}
 	client := http.Client{}
 	response, err := client.Do(request)
 	if err != nil {
-		return "", err
+		return fullstate, err
 	}
 	defer response.Body.Close()
 	contents, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return "", err
+		return fullstate, err
 	}
-	return string(contents), err
+	err = json.Unmarshal(contents, &fullstate)
+	if err != nil {
+		return fullstate, err
+	}
+	return fullstate, err
 }
 
 func (c *Configuration) GetConfiguration(username string) (Configuration, error) {
