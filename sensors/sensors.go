@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -128,6 +129,8 @@ func (l *Sensors) GetAllSensors() ([]Sensor, error) {
 	if err != nil {
 		return nil, err
 	}
+	//fmt.Println(string(contents))
+
 	sensorsMap := map[string]Sensor{}
 	err = json.Unmarshal(contents, &sensorsMap)
 	if err != nil {
@@ -138,6 +141,9 @@ func (l *Sensors) GetAllSensors() ([]Sensor, error) {
 		sensor.ID, _ = strconv.Atoi(sensorID)
 		sensors = append(sensors, sensor)
 	}
+
+	sort.Slice(sensors, func(i, j int) bool { return sensors[i].ID < sensors[j].ID })
+
 	return sensors, err
 }
 

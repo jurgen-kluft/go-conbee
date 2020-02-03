@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -170,6 +171,8 @@ func (l *Lights) GetAllLights() ([]Light, error) {
 		light.ID, _ = strconv.Atoi(lightID)
 		lights = append(lights, light)
 	}
+
+	sort.Slice(lights, func(i, j int) bool { return lights[i].ID < lights[j].ID })
 	return lights, err
 }
 

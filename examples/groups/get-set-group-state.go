@@ -24,7 +24,7 @@ func usage() {
 func init() {
 	on := new(bool)
 	*on = true
-	blinkState = groups.State{On: on}
+	blinkState = groups.State{On: on, Alert: "lselect"}
 	flag.StringVar(&conbeeHost, "host", os.Getenv("DECONZ_CONBEE_HOST"), "conbee host addr")
 	flag.StringVar(&conbeeKey, "key", os.Getenv("DECONZ_CONBEE_APIKEY"), "conbee api key")
 	flag.Parse()
@@ -44,7 +44,7 @@ func main() {
 		fmt.Println()
 		for _, g := range allGroups {
 			fmt.Println("------")
-			fmt.Printf("ID: %d Name: %s\n", g.ID, g.Name)
+			fmt.Printf("ID: %s Name: %s\n", g.ID, g.Name)
 			for _, lll := range g.Lights {
 				fmt.Println("\t", lll)
 			}
@@ -54,7 +54,7 @@ func main() {
 				fmt.Println("groups.SetGroupState() ERROR: ", err)
 				os.Exit(1)
 			}
-			time.Sleep(time.Second * time.Duration(10))
+			time.Sleep(time.Second * time.Duration(5))
 			_, err = gg.SetGroupState(g.ID, previousState)
 			if err != nil {
 				fmt.Println("groups.SetGroupState() ERROR: ", err)

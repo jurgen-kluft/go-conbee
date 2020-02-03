@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -31,6 +32,7 @@ type State struct {
 	On     *bool     `json:"on"`
 	Hue    uint16    `json:"hue,omitempty"`
 	Effect string    `json:"effect,omitempty"`
+	Alert  string    `json:"alert,omitempty"`
 	Bri    *uint8    `json:"bri,omitempty"`
 	Sat    uint8     `json:"sat,omitempty"`
 	CT     *uint16   `json:"ct,omitempty"`
@@ -38,7 +40,8 @@ type State struct {
 }
 
 type Group struct {
-	ID               int            `json:"id,omitempty"`
+	ID               int
+	TID              string         `json:"id,omitempty"`
 	ETag             string         `json:"etag,omitempty"`
 	Name             string         `json:"name"`
 	Hidden           bool           `json:"hidden"`
@@ -74,12 +77,16 @@ func (g *Groups) GetAllGroups() ([]Group, error) {
 	json.Unmarshal(contents, &groupsMap)
 	groups := make([]Group, 0, len(groupsMap))
 	for groupID, group := range groupsMap {
+		group.TID = groupID
 		group.ID, err = strconv.Atoi(groupID)
 		if err != nil {
 			return nil, err
 		}
 		groups = append(groups, group)
 	}
+
+	sort.Slice(groups, func(i, j int) bool { return groups[i].ID < groups[j].ID })
+
 	return groups, err
 }
 
@@ -131,6 +138,7 @@ func (g *Groups) GetGroupAttrs(groupID int) (Group, error) {
 		return gg, err
 	}
 	gg.ID = groupID
+	gg.TID = fmt.Sprintf("%d", groupID)
 	err = json.Unmarshal(contents, &gg)
 	if err != nil {
 		return gg, err

@@ -69,12 +69,12 @@ type Configuration struct {
 
 // FullState is populated when calling GetFullState()
 type FullState struct {
-	Config    Configuration        `json:config`
-	Groups    []groups.Group       `json:groups`
-	Lights    []lights.Light       `json:lights`
-	Sensors   []sensors.Sensor     `json:sensors`
-	Schedules []schedules.Schedule `json:schedules`
-	Rules     []rules.Rule         `json:rules`
+	Config    Configuration                 `json:config`
+	Groups    map[string]groups.Group       `json:groups`
+	Lights    map[string]lights.Light       `json:lights`
+	Sensors   map[string]sensors.Sensor     `json:sensors`
+	Schedules map[string]schedules.Schedule `json:schedules`
+	Rules     map[string]rules.Rule         `json:rules`
 }
 
 func New(hostname string) *Configuration {

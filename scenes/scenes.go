@@ -8,7 +8,7 @@ type Scenes struct {
 }
 
 type Scene struct {
-	ID     int
+	ID     string
 	Name   string   `json:"name"`
 	Lights []string `json:lights`
 }
