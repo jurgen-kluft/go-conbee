@@ -40,8 +40,7 @@ func main() {
 		fmt.Println("Sensors")
 		fmt.Println("------")
 		for _, l := range sensors {
-			fmt.Printf("ID: %d Name: %s\n", l.ID, l.Name)
-			fmt.Printf("    Type = %s\n", l.Type)
+			fmt.Printf("Sensor:\n%s\n", l.StringWithIndentation("  "))
 		}
 	} else {
 		usage()

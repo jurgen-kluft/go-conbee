@@ -29,8 +29,9 @@ To install "github.com/jurgen-kluft/go-conbee" golang module.
 
 Check the examples:
 
--- ``set-light-state.go``
--- ``get-light-state.go``
+- ``get-all-lights.go``
+- ``get-light-state.go``
+- ``set-light-state.go``
 
 To run the tests you'll need to set the following environment variables:
 

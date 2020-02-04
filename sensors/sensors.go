@@ -148,26 +148,35 @@ func (l *Sensors) GetAllSensors() ([]Sensor, error) {
 }
 
 func (l *Sensor) String() string {
+	return l.StringWithIndentation("")
+}
+
+func (l *Sensor) StringWithIndentation(indentation string) string {
 	var buffer bytes.Buffer
-	buffer.WriteString(fmt.Sprintf("Id:              %d\n", l.ID))
-	buffer.WriteString(fmt.Sprintf("Name:            %s\n", l.Name))
-	buffer.WriteString(fmt.Sprintf("Type:            %s\n", l.Type))
-	buffer.WriteString(fmt.Sprintf("ModelId:         %s\n", l.ModelID))
-	buffer.WriteString(fmt.Sprintf("SwVersion:       %s\n", l.SWVersion))
-	buffer.WriteString(fmt.Sprint("State:\n"))
-	buffer.WriteString(l.State.String())
+	buffer.WriteString(fmt.Sprintf("%sID:              %d\n", indentation, l.ID))
+	buffer.WriteString(fmt.Sprintf("%sUUID:            %s\n", indentation, l.UniqueID))
+	buffer.WriteString(fmt.Sprintf("%sName:            %s\n", indentation, l.Name))
+	buffer.WriteString(fmt.Sprintf("%sType:            %s\n", indentation, l.Type))
+	buffer.WriteString(fmt.Sprintf("%sModelId:         %s\n", indentation, l.ModelID))
+	buffer.WriteString(fmt.Sprintf("%sSwVersion:       %s\n", indentation, l.SWVersion))
+	buffer.WriteString(fmt.Sprintf("%sState:\n", indentation))
+	buffer.WriteString(l.State.StringWithIndentation(indentation + indentation))
 	return buffer.String()
 }
 
 func (s *State) String() string {
+	return s.StringWithIndentation("")
+}
+
+func (s *State) StringWithIndentation(indentation string) string {
 	var buffer bytes.Buffer
-	buffer.WriteString(fmt.Sprintf("ButtonEvent:     %d\n", s.ButtonEvent))
-	buffer.WriteString(fmt.Sprintf("Daylight:        %t\n", s.Daylight))
-	buffer.WriteString(fmt.Sprintf("Dark:            %t\n", s.Dark))
-	buffer.WriteString(fmt.Sprintf("LastUpdated:     %s\n", s.LastUpdated))
-	buffer.WriteString(fmt.Sprintf("LightLevel:      %d\n", s.LightLevel))
-	buffer.WriteString(fmt.Sprintf("Presence:        %t\n", s.Presence))
-	buffer.WriteString(fmt.Sprintf("Status:          %d\n", s.Status))
-	buffer.WriteString(fmt.Sprintf("Temperature:     %d\n", s.Temperature))
+	buffer.WriteString(fmt.Sprintf("%sButtonEvent:     %d\n", indentation, s.ButtonEvent))
+	buffer.WriteString(fmt.Sprintf("%sDaylight:        %t\n", indentation, s.Daylight))
+	buffer.WriteString(fmt.Sprintf("%sDark:            %t\n", indentation, s.Dark))
+	buffer.WriteString(fmt.Sprintf("%sLastUpdated:     %s\n", indentation, s.LastUpdated))
+	buffer.WriteString(fmt.Sprintf("%sLightLevel:      %d\n", indentation, s.LightLevel))
+	buffer.WriteString(fmt.Sprintf("%sPresence:        %t\n", indentation, s.Presence))
+	buffer.WriteString(fmt.Sprintf("%sStatus:          %d\n", indentation, s.Status))
+	buffer.WriteString(fmt.Sprintf("%sTemperature:     %d\n", indentation, s.Temperature))
 	return buffer.String()
 }

@@ -178,7 +178,8 @@ func (l *Lights) GetAllLights() ([]Light, error) {
 
 func (l *Light) String() string {
 	var buffer bytes.Buffer
-	buffer.WriteString(fmt.Sprintf("Id:              %d\n", l.ID))
+	buffer.WriteString(fmt.Sprintf("ID:              %d\n", l.ID))
+	buffer.WriteString(fmt.Sprintf("UUID:            %s\n", l.UniqueID))
 	buffer.WriteString(fmt.Sprintf("Name:            %s\n", l.Name))
 	buffer.WriteString(fmt.Sprintf("Type:            %s\n", l.Type))
 	buffer.WriteString(fmt.Sprintf("ModelId:         %s\n", l.ModelID))
@@ -191,23 +192,25 @@ func (l *Light) String() string {
 func (s *State) String() string {
 	var buffer bytes.Buffer
 	if s.On != nil {
-		buffer.WriteString(fmt.Sprintf("On:              %t\n", s.On))
+		buffer.WriteString(fmt.Sprintf("On:              %t\n", *s.On))
 	}
 	buffer.WriteString(fmt.Sprintf("Hue:             %d\n", s.Hue))
 	buffer.WriteString(fmt.Sprintf("Effect:          %s\n", s.Effect))
 	if s.Bri != nil {
-		buffer.WriteString(fmt.Sprintf("Bri:             %d\n", s.Bri))
+		buffer.WriteString(fmt.Sprintf("Bri:             %d\n", *s.Bri))
 	}
 	buffer.WriteString(fmt.Sprintf("Sat:             %d\n", s.Sat))
 	if s.CT != nil {
-		buffer.WriteString(fmt.Sprintf("CT:              %d\n", s.CT))
+		buffer.WriteString(fmt.Sprintf("CT:              %d\n", *s.CT))
 	}
 	if len(s.XY) > 0 {
 		buffer.WriteString(fmt.Sprintf("XY:              %g, %g\n", s.XY[0], s.XY[1]))
 	}
 	buffer.WriteString(fmt.Sprintf("Alert:           %s\n", s.Alert))
 	buffer.WriteString(fmt.Sprintf("TransitionTime:  %d\n", s.TransitionTime))
-	buffer.WriteString(fmt.Sprintf("Reachable:       %t\n", s.Reachable))
+	if s.Reachable != nil {
+		buffer.WriteString(fmt.Sprintf("Reachable:       %t\n", *s.Reachable))
+	}
 	buffer.WriteString(fmt.Sprintf("ColorMode:       %s\n", s.ColorMode))
 	return buffer.String()
 }

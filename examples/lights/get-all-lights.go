@@ -40,7 +40,7 @@ func main() {
 		fmt.Println("Lights")
 		fmt.Println("------")
 		for _, l := range allLights {
-			fmt.Printf("ID: %d Name: %s\n", l.ID, l.Name)
+			fmt.Printf("Light:\n%s\n", l.String())
 		}
 	} else {
 		usage()

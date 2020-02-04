@@ -228,16 +228,16 @@ func (g *Groups) DeleteGroup(groupID int) ([]conbee.ApiResponse, error) {
 func (s *State) String() string {
 	var buffer bytes.Buffer
 	if s.On != nil {
-		buffer.WriteString(fmt.Sprintf("On:              %t\n", s.On))
+		buffer.WriteString(fmt.Sprintf("On:              %v\n", *s.On))
 	}
 	buffer.WriteString(fmt.Sprintf("Hue:             %d\n", s.Hue))
 	buffer.WriteString(fmt.Sprintf("Effect:          %s\n", s.Effect))
 	if s.Bri != nil {
-		buffer.WriteString(fmt.Sprintf("Bri:             %d\n", s.Bri))
+		buffer.WriteString(fmt.Sprintf("Bri:             %d\n", *s.Bri))
 	}
 	buffer.WriteString(fmt.Sprintf("Sat:             %d\n", s.Sat))
 	if s.CT != nil {
-		buffer.WriteString(fmt.Sprintf("CT:              %d\n", s.CT))
+		buffer.WriteString(fmt.Sprintf("CT:              %d\n", *s.CT))
 	}
 	if len(s.XY) > 0 {
 		buffer.WriteString(fmt.Sprintf("XY:              %g, %g\n", s.XY[0], s.XY[1]))
@@ -253,7 +253,7 @@ func (g *Group) String() string {
 	buffer.WriteString(g.Action.String())
 	buffer.WriteString("Lights:\n")
 	for _, lightID := range g.Lights {
-		buffer.WriteString(fmt.Sprintf("\t%s\n", lightID))
+		buffer.WriteString(fmt.Sprintf(" %s", lightID))
 	}
 	return buffer.String()
 }
