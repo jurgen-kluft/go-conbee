@@ -43,11 +43,11 @@ type Light struct {
 
 type State struct {
 	On             *bool     `json:"on,omitempty"`
-	Hue            uint16    `json:"hue,omitempty"`
+	Hue            *uint16   `json:"hue,omitempty"`
 	Effect         string    `json:"effect,omitempty"`
 	Bri            *uint8    `json:"bri,omitempty"`
-	Sat            uint8     `json:"sat,omitempty"`
-	CT             *uint16   `json:"ct,omitempty"`
+	Sat            *uint8    `json:"sat,omitempty"`
+	CT             uint16    `json:"ct,omitempty"`
 	XY             []float32 `json:"xy,omitempty"`
 	Alert          string    `json:"alert,omitempty"`
 	Reachable      *bool     `json:"reachable,omitempty"`
@@ -115,7 +115,18 @@ func (l *Lights) SetLightAttrs(lightID int, lightName string) ([]conbee.ApiRespo
 	return apiResponse, err
 }
 
-func (l *Lights) SetLightState(lightID int, state State) ([]conbee.ApiResponse, error) {
+func (state *State) SetOn(OnOff bool) {
+	state.On = new(bool)
+	*state.On = OnOff
+}
+
+func (state *State) SetCT(Bri uint8, CT uint16) {
+	state.Bri = new(uint8)
+	*state.Bri = Bri
+	state.CT = CT
+}
+
+func (l *Lights) SetLightState(lightID int, state *State) ([]conbee.ApiResponse, error) {
 	url := fmt.Sprintf(setLightStateURL, l.Hostname, l.APIkey, lightID)
 	stateJSON, err := json.Marshal(&state)
 	if err != nil {
@@ -194,23 +205,38 @@ func (s *State) String() string {
 	if s.On != nil {
 		buffer.WriteString(fmt.Sprintf("On:              %t\n", *s.On))
 	}
-	buffer.WriteString(fmt.Sprintf("Hue:             %d\n", s.Hue))
-	buffer.WriteString(fmt.Sprintf("Effect:          %s\n", s.Effect))
+	if s.Hue != nil {
+		buffer.WriteString(fmt.Sprintf("Hue:             %d\n", *s.Hue))
+	}
+	if len(s.Effect) > 0 {
+		buffer.WriteString(fmt.Sprintf("Effect:          %s\n", s.Effect))
+	}
 	if s.Bri != nil {
 		buffer.WriteString(fmt.Sprintf("Bri:             %d\n", *s.Bri))
 	}
-	buffer.WriteString(fmt.Sprintf("Sat:             %d\n", s.Sat))
-	if s.CT != nil {
-		buffer.WriteString(fmt.Sprintf("CT:              %d\n", *s.CT))
+	if s.Sat != nil {
+		buffer.WriteString(fmt.Sprintf("Sat:             %d\n", *s.Sat))
+	}
+	if s.CT > 0 {
+		buffer.WriteString(fmt.Sprintf("CT:              %d\n", s.CT))
 	}
 	if len(s.XY) > 0 {
 		buffer.WriteString(fmt.Sprintf("XY:              %g, %g\n", s.XY[0], s.XY[1]))
 	}
-	buffer.WriteString(fmt.Sprintf("Alert:           %s\n", s.Alert))
-	buffer.WriteString(fmt.Sprintf("TransitionTime:  %d\n", s.TransitionTime))
+	if len(s.Alert) > 0 {
+		buffer.WriteString(fmt.Sprintf("Alert:           %s\n", s.Alert))
+	}
+	if s.TransitionTime > 0 {
+		buffer.WriteString(fmt.Sprintf("TransitionTime:  %d\n", s.TransitionTime))
+	}
 	if s.Reachable != nil {
 		buffer.WriteString(fmt.Sprintf("Reachable:       %t\n", *s.Reachable))
 	}
-	buffer.WriteString(fmt.Sprintf("ColorMode:       %s\n", s.ColorMode))
+	if len(s.ColorMode) > 0 {
+		buffer.WriteString(fmt.Sprintf("ColorMode:       %s\n", s.ColorMode))
+	}
+	if s.ColorLoopSpeed > 0 {
+		buffer.WriteString(fmt.Sprintf("ColorLoopSpeed:  %s\n", s.ColorLoopSpeed))
+	}
 	return buffer.String()
 }

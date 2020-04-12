@@ -24,19 +24,27 @@ type Sensors struct {
 }
 
 type Sensor struct {
-	ID               int    `json:"id,omitempty"`
+	ID               int
+	Config           Config `json:"config,omitempty"`
+	Ep               int    `json:"ep,omitempty"`
+	ETag             string `json:"etag"`
+	ManufacturerName string `json:"manufacturername,omitempty"`
+	ModelID          string `json:"modelid,omitempty"`
 	Name             string `json:"name"`
 	State            State  `json:"state,omitempty"`
-	Config           Config `json:"config,omitempty"`
-	Type             string `json:"type,omitempty"`
-	ModelID          string `json:"modelid,omitempty"`
 	SWVersion        string `json:"swversion,omitempty"`
-	ManufacturerName string `json:"manufacturername,omitempty"`
+	Type             string `json:"type,omitempty"`
 	UniqueID         string `json:"uniqueid,omitempty"`
+}
+
+func (s *Sensor) setDefaults() {
+	s.Config.Reachable = true
 }
 
 type Config struct {
 	On            bool   `json:"on"`
+	Reachable     bool   `json:"reachable"`
+	Battery       int16  `json:"battery,omitempty"`
 	Long          string `json:"long,omitempty"`
 	Lat           string `json:"lat,omitempty"`
 	SunriseOffset int16  `json:"sunriseoffset,omitempty"`
@@ -44,14 +52,17 @@ type Config struct {
 }
 
 type State struct {
-	Presence    bool   `json:"presence,omitempty"`
-	LastUpdated string `json:"lastupdated,omitempty"`
 	ButtonEvent int16  `json:"buttonevent,omitempty"`
-	Status      int16  `json:"status,omitempty"`
+	Open        bool   `json:"open,omitempty"`
+	Presence    bool   `json:"presence,omitempty"`
 	Temperature int16  `json:"temperature,omitempty"`
+	Flag        bool   `json:"flag,omitempty"`
+	Status      int16  `json:"status,omitempty"`
+	Humidity    int16  `json:"humidity,omitempty"`
 	LightLevel  int16  `json:"lightlevel,omitempty"`
 	Dark        bool   `json:"dark,omitempty"`
 	Daylight    bool   `json:"daylight,omitempty"`
+	LastUpdated string `json:"lastupdated,omitempty"`
 }
 
 func New(hostname string, apikey string) *Sensors {
@@ -161,6 +172,8 @@ func (l *Sensor) StringWithIndentation(indentation string) string {
 	buffer.WriteString(fmt.Sprintf("%sSwVersion:       %s\n", indentation, l.SWVersion))
 	buffer.WriteString(fmt.Sprintf("%sState:\n", indentation))
 	buffer.WriteString(l.State.StringWithIndentation(indentation + indentation))
+	buffer.WriteString(fmt.Sprintf("%sConfig:\n", indentation))
+	buffer.WriteString(l.Config.StringWithIndentation(indentation + indentation))
 	return buffer.String()
 }
 
@@ -178,5 +191,25 @@ func (s *State) StringWithIndentation(indentation string) string {
 	buffer.WriteString(fmt.Sprintf("%sPresence:        %t\n", indentation, s.Presence))
 	buffer.WriteString(fmt.Sprintf("%sStatus:          %d\n", indentation, s.Status))
 	buffer.WriteString(fmt.Sprintf("%sTemperature:     %d\n", indentation, s.Temperature))
+	return buffer.String()
+}
+
+func (c *Config) String() string {
+	return c.StringWithIndentation("")
+}
+
+func (c *Config) StringWithIndentation(indentation string) string {
+	var buffer bytes.Buffer
+	buffer.WriteString(fmt.Sprintf("%sOn:            %t\n", indentation, c.On))
+	buffer.WriteString(fmt.Sprintf("%sReachable:     %t\n", indentation, c.Reachable))
+	buffer.WriteString(fmt.Sprintf("%sBattery:       %d\n", indentation, c.Battery))
+	if len(c.Long) > 0 {
+		buffer.WriteString(fmt.Sprintf("%sLong:          %s\n", indentation, c.Long))
+	}
+	if len(c.Lat) > 0 {
+		buffer.WriteString(fmt.Sprintf("%sLat:           %s\n", indentation, c.Lat))
+	}
+	buffer.WriteString(fmt.Sprintf("%sSunriseOffset: %d\n", indentation, c.SunriseOffset))
+	buffer.WriteString(fmt.Sprintf("%sSunsetOffset:  %d\n", indentation, c.SunsetOffset))
 	return buffer.String()
 }
