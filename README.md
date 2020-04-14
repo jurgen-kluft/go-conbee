@@ -2,6 +2,8 @@
 
 Conbee II client for Go.
 
+CREDIT to 'heatxsink', he implemented 'go-hue' on which this package is based. (https://github.com/heatxsink/go-hue)
+
 ## Status
 
 BETA, currently testing!
