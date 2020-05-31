@@ -42,18 +42,18 @@ type Light struct {
 }
 
 type State struct {
-	On             *bool     `json:"on,omitempty"`
-	Hue            *uint16   `json:"hue,omitempty"`
-	Effect         string    `json:"effect,omitempty"`
-	Bri            *uint8    `json:"bri,omitempty"`
-	Sat            *uint8    `json:"sat,omitempty"`
-	CT             uint16    `json:"ct,omitempty"`
+	On             *bool     `json:"on,omitempty"`     //
+	Hue            *uint16   `json:"hue,omitempty"`    //
+	Effect         string    `json:"effect,omitempty"` //
+	Bri            *uint8    `json:"bri,omitempty"`    // min = 1, max = 254
+	Sat            *uint8    `json:"sat,omitempty"`    //
+	CT             *uint16   `json:"ct,omitempty"`     // min = 154, max = 500
 	XY             []float32 `json:"xy,omitempty"`
 	Alert          string    `json:"alert,omitempty"`
 	Reachable      *bool     `json:"reachable,omitempty"`
 	ColorMode      string    `json:"colormode,omitempty"`
-	ColorLoopSpeed uint8     `json:"colorloopspeed,omitempty"`
-	TransitionTime uint16    `json:"transitiontime,omitempty"`
+	ColorLoopSpeed *uint8    `json:"colorloopspeed,omitempty"`
+	TransitionTime *uint16   `json:"transitiontime,omitempty"`
 }
 
 func New(hostname string, apikey string) *Lights {
@@ -120,10 +120,17 @@ func (state *State) SetOn(OnOff bool) {
 	*state.On = OnOff
 }
 
-func (state *State) SetCT(Bri uint8, CT uint16) {
+func (state *State) SetCT(Bri int, CT int) {
 	state.Bri = new(uint8)
-	*state.Bri = Bri
-	state.CT = CT
+	*state.Bri = uint8(Bri)
+	state.CT = new(uint16)
+	*state.CT = uint16(CT)
+}
+
+func (state *State) SetXY(x, y float32) {
+	state.XY = make([]float32, 2, 2)
+	state.XY[0] = x
+	state.XY[1] = y
 }
 
 func (l *Lights) SetLightState(lightID int, state *State) ([]conbee.ApiResponse, error) {
@@ -217,8 +224,8 @@ func (s *State) String() string {
 	if s.Sat != nil {
 		buffer.WriteString(fmt.Sprintf("Sat:             %d\n", *s.Sat))
 	}
-	if s.CT > 0 {
-		buffer.WriteString(fmt.Sprintf("CT:              %d\n", s.CT))
+	if s.CT != nil && *s.CT > 0 {
+		buffer.WriteString(fmt.Sprintf("CT:              %d\n", *s.CT))
 	}
 	if len(s.XY) > 0 {
 		buffer.WriteString(fmt.Sprintf("XY:              %g, %g\n", s.XY[0], s.XY[1]))
@@ -226,8 +233,8 @@ func (s *State) String() string {
 	if len(s.Alert) > 0 {
 		buffer.WriteString(fmt.Sprintf("Alert:           %s\n", s.Alert))
 	}
-	if s.TransitionTime > 0 {
-		buffer.WriteString(fmt.Sprintf("TransitionTime:  %d\n", s.TransitionTime))
+	if s.TransitionTime != nil && *s.TransitionTime > 0 {
+		buffer.WriteString(fmt.Sprintf("TransitionTime:  %d\n", *s.TransitionTime))
 	}
 	if s.Reachable != nil {
 		buffer.WriteString(fmt.Sprintf("Reachable:       %t\n", *s.Reachable))
@@ -235,8 +242,8 @@ func (s *State) String() string {
 	if len(s.ColorMode) > 0 {
 		buffer.WriteString(fmt.Sprintf("ColorMode:       %s\n", s.ColorMode))
 	}
-	if s.ColorLoopSpeed > 0 {
-		buffer.WriteString(fmt.Sprintf("ColorLoopSpeed:  %s\n", s.ColorLoopSpeed))
+	if s.ColorLoopSpeed != nil && *s.ColorLoopSpeed > 0 {
+		buffer.WriteString(fmt.Sprintf("ColorLoopSpeed:  %d\n", *s.ColorLoopSpeed))
 	}
 	return buffer.String()
 }

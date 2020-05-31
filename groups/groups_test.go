@@ -5,8 +5,6 @@ import (
 	"os"
 	"testing"
 	"time"
-
-	"github.com/jurgen-kluft/go-conbee/lights"
 )
 
 var (
@@ -17,12 +15,12 @@ var (
 	sleepSeconds       int
 	sleepMilliSeconds  int
 	testLightNumbers   []int
-	redState           lights.State
-	blueState          lights.State
-	whiteState         lights.State
-	offState           lights.State
-	onState            lights.State
-	virginAmericaState lights.State
+	redState           State
+	blueState          State
+	whiteState         State
+	offState           State
+	onState            State
+	virginAmericaState State
 )
 
 func init() {
@@ -34,12 +32,30 @@ func init() {
 	sleepMilliSeconds = 100
 	testLightNumbers = []int{1, 2, 3, 4}
 
-	virginAmericaState = lights.State{On: true, Hue: 54179, Effect: "none", Bri: 230, Sat: 253, CT: 223, XY: []float32{0.3621, 0.1491}, Alert: "none", TransitionTime: transitionTime}
-	redState = lights.State{On: true, Hue: 65527, Effect: "none", Bri: 13, Sat: 253, CT: 500, XY: []float32{0.6736, 0.3221}, Alert: "none", TransitionTime: transitionTime}
-	blueState = lights.State{On: true, Hue: 46573, Effect: "none", Bri: 254, Sat: 251, CT: 500, XY: []float32{0.1754, 0.0556}, Alert: "none", TransitionTime: transitionTime}
-	whiteState = lights.State{On: true, Hue: 34495, Effect: "none", Bri: 203, Sat: 232, CT: 155, XY: []float32{0.3151, 0.3252}, Alert: "none", TransitionTime: transitionTime}
-	offState = lights.State{On: false}
-	onState = lights.State{On: true}
+	virginAmericaState = State{}
+	virginAmericaState.SetOn(true)
+	virginAmericaState.SetCT(230, 223)
+
+	redState = State{}
+	redState.SetOn(true)
+	redState.SetCT(13, 253)
+	redState.SetXY(0.6736, 0.3221)
+
+	blueState = State{}
+	blueState.SetOn(true)
+	blueState.SetCT(254, 500)
+	blueState.SetXY(0.1754, 0.0556)
+
+	whiteState = State{}
+	whiteState.SetOn(true)
+	whiteState.SetCT(203, 232)
+	whiteState.SetXY(0.3151, 0.3252)
+
+	offState = State{}
+	offState.SetOn(false)
+
+	onState = State{}
+	offState.SetOn(true)
 }
 
 func TestCreateGroup(t *testing.T) {
@@ -52,22 +68,22 @@ func TestCreateGroup(t *testing.T) {
 
 func TestSetGroup(t *testing.T) {
 	group := Group{Name: "Office", Lights: []string{"1", "2"}}
-	_, err := testGroups.SetGroup(1, group)
+	_, err := testGroups.SetGroupAttrs(1, group)
 	if err != nil {
 		t.Fail()
 	}
 	group = Group{Name: "Bedroom", Lights: []string{"3", "4"}}
-	_, err = testGroups.SetGroup(2, group)
+	_, err = testGroups.SetGroupAttrs(2, group)
 	if err != nil {
 		t.Fail()
 	}
 	group = Group{Name: "Living Room", Lights: []string{"5", "6"}}
-	_, err = testGroups.SetGroup(3, group)
+	_, err = testGroups.SetGroupAttrs(3, group)
 	if err != nil {
 		t.Fail()
 	}
 	group = Group{Name: "Upstairs", Lights: []string{"1", "2", "3", "4", "5", "6", "8"}}
-	_, err = testGroups.SetGroup(4, group)
+	_, err = testGroups.SetGroupAttrs(4, group)
 	if err != nil {
 		t.Fail()
 	}
@@ -85,7 +101,7 @@ func TestGetAllGroups(t *testing.T) {
 
 func TestGetGroup(t *testing.T) {
 	for _, groupID := range testLightNumbers {
-		g, err := testGroups.GetGroup(groupID)
+		g, err := testGroups.GetGroupAttrs(groupID)
 		if err != nil {
 			fmt.Println(err)
 			t.Fail()
@@ -94,7 +110,7 @@ func TestGetGroup(t *testing.T) {
 	}
 }
 
-func test_set_group_state(t *testing.T, state lights.State) {
+func test_set_group_state(t *testing.T, state State) {
 	groups, err := testGroups.GetAllGroups()
 	if err != nil {
 		t.Fail()
@@ -125,8 +141,6 @@ func TestSetGroupState(t *testing.T) {
 		if group.ID == 0 {
 			continue
 		}
-		group.Action.TransitionTime = transitionTime
-		group.Action.Alert = "none"
 		// TODO: need to test response.
 		_, err := testGroups.SetGroupState(group.ID, group.Action)
 		if err != nil {

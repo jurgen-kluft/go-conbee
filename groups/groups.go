@@ -29,22 +29,40 @@ type Groups struct {
 }
 
 type State struct {
-	On     *bool     `json:"on"`
-	Hue    uint16    `json:"hue,omitempty"`
+	On     *bool     `json:"on,omitempty"`
+	Hue    *uint16   `json:"hue,omitempty"`
 	Effect string    `json:"effect,omitempty"`
 	Alert  string    `json:"alert,omitempty"`
 	Bri    *uint8    `json:"bri,omitempty"`
-	Sat    uint8     `json:"sat,omitempty"`
+	Sat    *uint8    `json:"sat,omitempty"`
 	CT     *uint16   `json:"ct,omitempty"`
 	XY     []float32 `json:"xy,omitempty"`
+}
+
+func (state *State) SetOn(OnOff bool) {
+	state.On = new(bool)
+	*state.On = OnOff
+}
+
+func (state *State) SetCT(Bri int, CT int) {
+	state.Bri = new(uint8)
+	*state.Bri = uint8(Bri)
+	state.CT = new(uint16)
+	*state.CT = uint16(CT)
+}
+
+func (state *State) SetXY(x, y float32) {
+	state.XY = make([]float32, 2, 2)
+	state.XY[0] = x
+	state.XY[1] = y
 }
 
 type Group struct {
 	ID               int
 	TID              string         `json:"id,omitempty"`
 	ETag             string         `json:"etag,omitempty"`
-	Name             string         `json:"name"`
-	Hidden           bool           `json:"hidden"`
+	Name             string         `json:"name,omitempty"`
+	Hidden           bool           `json:"hidden,omitempty"`
 	Action           State          `json:"action,omitempty"`
 	Lights           []string       `json:"lights,omitempty"`
 	LightSequence    []string       `json:"lightsequence,omitempty"`
@@ -149,7 +167,13 @@ func (g *Groups) GetGroupAttrs(groupID int) (Group, error) {
 func (g *Groups) SetGroupAttrs(groupID int, group Group) ([]conbee.ApiResponse, error) {
 	var apiResponse []conbee.ApiResponse
 	url := fmt.Sprintf(setGroupAttrsURL, g.Hostname, g.APIkey, groupID)
-	jsonData, err := json.Marshal(&group)
+	gg := Group{}
+	gg.Name = group.Name
+	gg.Lights = group.Lights
+	gg.Hidden = group.Hidden
+	gg.LightSequence = group.LightSequence
+	gg.MultiDeviceIDs = group.MultiDeviceIDs
+	jsonData, err := json.Marshal(&gg)
 	if err != nil {
 		return apiResponse, err
 	}
@@ -228,19 +252,25 @@ func (g *Groups) DeleteGroup(groupID int) ([]conbee.ApiResponse, error) {
 func (s *State) String() string {
 	var buffer bytes.Buffer
 	if s.On != nil {
-		buffer.WriteString(fmt.Sprintf("On:              %v\n", *s.On))
+		buffer.WriteString(fmt.Sprintf("    On:     %v\n", *s.On))
 	}
-	buffer.WriteString(fmt.Sprintf("Hue:             %d\n", s.Hue))
-	buffer.WriteString(fmt.Sprintf("Effect:          %s\n", s.Effect))
+	if s.Hue != nil {
+		buffer.WriteString(fmt.Sprintf("    Hue:    %d\n", *s.Hue))
+	}
+	if len(s.Effect) > 0 {
+		buffer.WriteString(fmt.Sprintf("    Effect: %s\n", s.Effect))
+	}
 	if s.Bri != nil {
-		buffer.WriteString(fmt.Sprintf("Bri:             %d\n", *s.Bri))
+		buffer.WriteString(fmt.Sprintf("    Bri:    %d\n", *s.Bri))
 	}
-	buffer.WriteString(fmt.Sprintf("Sat:             %d\n", s.Sat))
+	if s.Sat != nil {
+		buffer.WriteString(fmt.Sprintf("    Sat:    %d\n", s.Sat))
+	}
 	if s.CT != nil {
-		buffer.WriteString(fmt.Sprintf("CT:              %d\n", *s.CT))
+		buffer.WriteString(fmt.Sprintf("    CT:     %d\n", *s.CT))
 	}
 	if len(s.XY) > 0 {
-		buffer.WriteString(fmt.Sprintf("XY:              %g, %g\n", s.XY[0], s.XY[1]))
+		buffer.WriteString(fmt.Sprintf("    XY:     %g, %g\n", s.XY[0], s.XY[1]))
 	}
 	return buffer.String()
 }
@@ -248,12 +278,16 @@ func (s *State) String() string {
 func (g *Group) String() string {
 	var buffer bytes.Buffer
 	buffer.WriteString(fmt.Sprintf("ID:              %d\n", g.ID))
+	buffer.WriteString(fmt.Sprintf("TID:             %s\n", g.TID))
+	buffer.WriteString(fmt.Sprintf("ETag:            %s\n", g.ETag))
 	buffer.WriteString(fmt.Sprintf("Name:            %s\n", g.Name))
 	buffer.WriteString("Action:\n")
 	buffer.WriteString(g.Action.String())
-	buffer.WriteString("Lights:\n")
-	for _, lightID := range g.Lights {
-		buffer.WriteString(fmt.Sprintf(" %s", lightID))
+	if len(g.Lights) > 0 {
+		buffer.WriteString("Lights:\n")
+		for _, lightID := range g.Lights {
+			buffer.WriteString(fmt.Sprintf(" %s", lightID))
+		}
 	}
 	return buffer.String()
 }
