@@ -1,5 +1,7 @@
 #ignore all files
 *
+#do scan all folders in go-home
+!*/
 
 #except the following files
 !*.cpp
