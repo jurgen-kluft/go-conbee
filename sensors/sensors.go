@@ -21,6 +21,7 @@ var (
 type Sensors struct {
 	Hostname string
 	APIkey   string
+	Client   http.Client
 }
 
 type Sensor struct {
@@ -69,6 +70,7 @@ func New(hostname string, apikey string) *Sensors {
 	return &Sensors{
 		Hostname: hostname,
 		APIkey:   apikey,
+		Client:   http.Client{},
 	}
 }
 
@@ -79,8 +81,7 @@ func (l *Sensors) GetSensor(sensorID int) (Sensor, error) {
 	if err != nil {
 		return ll, err
 	}
-	client := http.Client{}
-	response, err := client.Do(request)
+	response, err := l.Client.Do(request)
 	if err != nil {
 		return ll, err
 	}
@@ -106,8 +107,7 @@ func (l *Sensors) UpdateSensor(sensorID int, sensorName string) ([]conbee.ApiRes
 		return nil, err
 	}
 	request.Header.Set("Content-Type", "application/json")
-	client := http.Client{}
-	response, err := client.Do(request)
+	response, err := l.Client.Do(request)
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +130,7 @@ func (l *Sensors) GetAllSensors() ([]Sensor, error) {
 	if err != nil {
 		return nil, err
 	}
-	client := http.Client{}
-	response, err := client.Do(request)
+	response, err := l.Client.Do(request)
 	if err != nil {
 		return nil, err
 	}
